@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>StripeID System</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body class="bg-black text-white overflow-hidden font-sans select-none w-screen h-screen">
+
+    <div class="relative w-full h-full bg-neutral-950">
+        <video id="webcam" autoplay playsinline muted class="w-full h-full object-cover"></video>
+        
+        <div class="absolute inset-0 pointer-events-none flex flex-col justify-between items-center py-14 px-6">
+            <h1 class="text-xs font-bold tracking-[0.2em] bg-black/50 px-6 py-3 rounded-full backdrop-blur-2xl border border-white/10 shadow-xl text-neutral-200">
+                STRIPE<span class="text-emerald-400">ID</span> v1.0
+            </h1>
+            
+            <div id="scanner-box" class="w-80 h-44 border-2 border-white/20 rounded-3xl relative flex items-center justify-center transition-all duration-300 bg-black/5">
+                <div class="absolute top-0 left-0 w-6 h-6 border-t-4 border-l-4 border-emerald-400 rounded-tl-xl -mt-[2px] -ml-[2px]"></div>
+                <div class="absolute top-0 right-0 w-6 h-6 border-t-4 border-r-4 border-emerald-400 rounded-tr-xl -mt-[2px] -mr-[2px]"></div>
+                <div class="absolute bottom-0 left-0 w-6 h-6 border-b-4 border-l-4 border-emerald-400 rounded-bl-xl -mb-[2px] -ml-[2px]"></div>
+                <div class="absolute bottom-0 right-0 w-6 h-6 border-b-4 border-r-4 border-emerald-400 rounded-br-xl -mb-[2px] -mr-[2px]"></div>
+                
+                <div id="scanner-laser" class="absolute w-[90%] h-[2px] bg-emerald-400 shadow-[0_0_15px_#10b981]"></div>
+                <p class="text-[10px] text-white/70 font-bold tracking-widest bg-black/60 px-4 py-2 rounded-full border border-white/5">ALINEAR FRÁNJA</p>
+            </div>
+
+            <div class="pointer-events-auto flex flex-col items-center">
+                <button id="btn-manual" class="px-5 py-2.5 bg-neutral-900/80 hover:bg-neutral-800 active:scale-95 transition-all text-[11px] font-semibold tracking-wider border border-white/10 rounded-2xl backdrop-blur-xl text-neutral-300 shadow-md">
+                    Simular Escaneo (00000000013)
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div id="product-card" class="fixed bottom-0 left-0 right-0 max-w-md mx-auto translate-y-full transition-transform duration-500 ease-out z-50 px-4 pb-6 pointer-events-none">
+        <div class="bg-neutral-900/75 border border-white/10 backdrop-blur-3xl rounded-[36px] p-6 shadow-[0_-15px_50px_rgba(0,0,0,0.6)] pointer-events-auto">
+            <div class="w-12 h-1.5 bg-white/20 rounded-full mx-auto mb-5 cursor-pointer" id="btn-close-bar"></div>
+            
+            <div class="flex flex-col gap-1">
+                <div class="flex items-center gap-2">
+                    <div class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></div>
+                    <span class="text-[10px] font-black uppercase tracking-[0.15em] text-emerald-400">Lectura Exitosa</span>
+                </div>
+                <h2 class="text-2xl font-bold tracking-tight text-white mt-1.5" id="prod-nombre">Cargando datos...</h2>
+                <p class="text-[11px] font-mono text-white/40" id="prod-id"></p>
+                
+                <div class="flex justify-between items-baseline mt-6 bg-white/[0.03] p-4 rounded-2xl border border-white/5">
+                    <span class="text-3xl font-black text-white tracking-tight" id="prod-precio">$0</span>
+                    <span class="text-xs font-bold text-neutral-400 bg-neutral-800/80 px-3 py-1.5 rounded-xl border border-white/5" id="prod-stock">Stock: 0 u.</span>
+                </div>
+            </div>
+
+            <button id="btn-close" class="mt-5 w-full py-4 bg-white text-black font-bold rounded-2xl active:scale-[0.98] transition-all text-xs tracking-wider uppercase shadow-xl">
+                Seguir Escaneando
+            </button>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
