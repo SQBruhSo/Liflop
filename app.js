@@ -1,54 +1,72 @@
-// 🚨 ATENCIÓN: Cambiá esta IP por la IP local de tu PC cuando pruebes desde el WiFi de tu celular
-const API_BASE_URL = 'http://127.0.0.1:8000'; 
-
 const video = document.getElementById('webcam');
 const productCard = document.getElementById('product-card');
 const scannerBox = document.getElementById('scanner-box');
 
 let escaneoBloqueado = false;
 
-// Inicialización de la cámara con fallback inteligente
-async function inicializarCamara() {
-    const configuraciones = [
-        { video: { facingMode: { exact: "environment" } }, audio: false }, // Trasera pura
-        { video: { facingMode: "environment" }, audio: false },            // Preferencia trasera
-        { video: true, audio: false }                                      // Cualquier dispositivo
-    ];
-
-    for (const conf of configuraciones) {
-        try {
-            const stream = await navigator.mediaDevices.getUserMedia(conf);
-            video.srcObject = stream;
-            console.log("Cámara vinculada de forma correcta.");
-            return;
-        } catch (e) {
-            console.log("Fallo de stream, saltando a siguiente configuración...");
-        }
+// 1. Validar el código matemáticamente en el celular
+function validarCodigo11Digitos(codigoStr) {
+    if (codigoStr.length !== 11 || isNaN(codigoStr)) return false;
+    
+    const digitos = codigoStr.split('').map(Number);
+    const digitoVerificadorReal = digitos[10];
+    
+    let sumaImpares = 0;
+    let sumaPares = 0;
+    
+    for (let i = 0; i < 10; i++) {
+        if (i % 2 === 0) sumaImpares += digitos[i];
+        else sumaPares += digitos[i];
     }
-    alert("No se detectó acceso a la cámara. Habilitá los permisos en el navegador de tu celular.");
+    
+    const resultadoCalculado = ((sumaImpares * 3) + sumaPares) % 10;
+    return resultadoCalculado === digitoVerificadorReal;
 }
 
-// Envío y recepción de datos con el Backend
+// 2. Encender la cámara
+async function inicializarCamara() {
+    try {
+        const stream = await navigator.mediaDevices.getUserMedia({
+            video: { facingMode: "environment" },
+            audio: false
+        });
+        video.srcObject = stream;
+    } catch (err) {
+        alert("Permití el acceso a la cámara para poder escanear.");
+    }
+}
+
+// 3. Procesar y buscar en el archivo JSON de GitHub
 async function procesarCodigoDetectado(codigo) {
     if (escaneoBloqueado) return;
     escaneoBloqueado = true;
 
-    // Feedback inmediato en pantalla y físico
     scannerBox.classList.add('box-success');
-    if (navigator.vibrate) navigator.vibrate(50); // Vibración háptica nativa
+    if (navigator.vibrate) navigator.vibrate(50); 
+
+    // Validar Requisito 3 (Sin errores matemáticos)
+    if (!validarCodigo11Digitos(codigo)) {
+        alert("Código inválido. Falló la confirmación real.");
+        reiniciarEscaner();
+        return;
+    }
 
     try {
-        const response = await fetch(`${API_BASE_URL}/scan/${codigo}`);
-        const data = await response.json();
+        // Buscamos el archivo directamente en tu GitHub Pages de forma relativa
+        const response = await fetch('./inventario.json');
+        const inventario = await response.json();
 
-        if (response.ok) {
-            mostrarTarjetaProducto(data.producto);
+        // Buscamos el producto clonado
+        const producto = inventario.find(p => p.codigo === codigo);
+
+        if (producto) {
+            mostrarTarjetaProducto(producto);
         } else {
-            alert(`Alerta del Sistema: ${data.detail || 'Error de procesamiento'}`);
+            alert("Producto no encontrado en el inventario.");
             reiniciarEscaner();
         }
     } catch (error) {
-        alert("Error de infraestructura: El servidor API backend no responde.");
+        alert("Error al leer la base de datos de GitHub.");
         reiniciarEscaner();
     }
 }
@@ -65,17 +83,13 @@ function mostrarTarjetaProducto(producto) {
 function reiniciarEscaner() {
     productCard.classList.remove('sheet-open');
     scannerBox.classList.remove('box-success');
-    setTimeout(() => {
-        escaneoBloqueado = false;
-    }, 400); // Ventana de tiempo para evitar spam de lecturas infinitas
+    setTimeout(() => { escaneoBloqueado = false; }, 400); 
 }
 
-// Escuchadores de eventos
 document.getElementById('btn-close').addEventListener('click', reiniciarEscaner);
 document.getElementById('btn-close-bar').addEventListener('click', reiniciarEscaner);
 document.getElementById('btn-manual').addEventListener('click', () => {
     procesarCodigoDetectado('00000000013');
 });
 
-// Lanzamiento
 window.addEventListener('load', inicializarCamara);
