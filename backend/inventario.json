@@ -1,0 +1,20 @@
+[
+  {
+    "codigo": "00000000013",
+    "nombre": "Remera Oversize Black",
+    "precio": 25000,
+    "stock": 15
+  },
+  {
+    "codigo": "00000000026",
+    "nombre": "Gorra Streetwear Nylon",
+    "precio": 12000,
+    "stock": 8
+  },
+  {
+    "codigo": "00000000039",
+    "nombre": "Pantalón Cargo Beige",
+    "precio": 42000,
+    "stock": 20
+  }
+]
